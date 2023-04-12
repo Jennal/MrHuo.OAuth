@@ -4,10 +4,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="MrHuo.OAuth.Core" Version="1.1.1" />
-  </ItemGroup>
-
   <PropertyGroup>
     <Copyright>https://oauthlogin.net/</Copyright>
     <PackageProjectUrl>https://github.com/mrhuo/MrHuo.OAuth</PackageProjectUrl>
@@ -34,6 +30,10 @@
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MrHuo.OAuth.Core\MrHuo.OAuth.Core.csproj" />
   </ItemGroup>
 
 </Project>
