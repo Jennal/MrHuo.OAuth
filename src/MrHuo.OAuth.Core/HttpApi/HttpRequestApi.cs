@@ -30,7 +30,7 @@ namespace MrHuo.OAuth
         {
             if (EnableDebugLog)
             {
-                Console.WriteLine(msg);
+                Console.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss zz}] {msg}");
             }
         }
 

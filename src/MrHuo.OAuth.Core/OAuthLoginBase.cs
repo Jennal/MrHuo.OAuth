@@ -71,14 +71,46 @@ namespace MrHuo.OAuth
         /// <returns></returns>
         protected virtual Dictionary<string, string> BuildGetAccessTokenParams(Dictionary<string, string> authorizeCallbackParams)
         {
+            var url = oauthConfig.RedirectUri;
+            if (authorizeCallbackParams.TryGetValue("url", out var baseUrl))
+            {
+                url = GetRedirectUrl(baseUrl);
+            }
+            
             return new Dictionary<string, string>()
             {
                 ["grant_type"] = "authorization_code",
                 ["code"] = $"{authorizeCallbackParams["code"]}",
                 ["client_id"] = $"{oauthConfig.AppId}",
                 ["client_secret"] = $"{oauthConfig.AppKey}",
-                ["redirect_uri"] = $"{oauthConfig.RedirectUri}"
+                ["redirect_uri"] = $"{url}"
             };
+        }
+
+        private string GetRedirectUrl(string baseUrl)
+        {
+            var url = oauthConfig.RedirectUri;
+            if (string.IsNullOrEmpty(baseUrl)) return url;
+            
+            var host = new Uri(baseUrl);
+            var redirectUri = new Uri(oauthConfig.RedirectUri);
+
+            Console.WriteLine("=======================================");
+            Console.WriteLine($"host: {host}");
+            Console.WriteLine($"redirect_uri: {oauthConfig.RedirectUri}");
+            Console.WriteLine("=======================================");
+
+            if (redirectUri.Host != host.Host)
+            {
+                url = new UriBuilder(redirectUri)
+                {
+                    Scheme = host.Scheme,
+                    Port = host.Port,
+                    Host = host.Host
+                }.Uri.ToString();
+            }
+
+            return url;
         }
 
         /// <summary>
@@ -106,6 +138,16 @@ namespace MrHuo.OAuth
             {
                 ["code"] = code,
                 ["state"] = state
+            });
+        }
+        
+        public virtual Task<TAccessTokenModel> GetAccessTokenAsync(string url, string code, string state = "")
+        {
+            return GetAccessTokenAsync(new Dictionary<string, string>()
+            {
+                ["code"] = code,
+                ["state"] = state,
+                ["url"] = url,
             });
         }
 
@@ -217,25 +259,14 @@ namespace MrHuo.OAuth
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        public virtual string GetAuthorizeUrl(HttpContext httpContext, string state = "")
+        public virtual string GetAuthorizeUrl(string baseUrl, string state = "")
         {
             var param = BuildAuthorizeParams(state);
             param.RemoveEmptyValueItems();
             
             if (param.ContainsKey("redirect_uri"))
             {
-                var host = httpContext.Request.Host.Host;
-                var redirectUri = new Uri(param["redirect_uri"]);
-        
-                if (redirectUri.Host != host)
-                {
-                    param["redirect_uri"] = new UriBuilder(redirectUri)
-                    {
-                        Scheme = httpContext.Request.Scheme,
-                        Port = httpContext.Request.Host.Port ?? redirectUri.Port,
-                        Host = host
-                    }.Uri.ToString();
-                }
+                param["redirect_uri"] = GetRedirectUrl(baseUrl);
             }
             
             return $"{AuthorizeUrl}{(AuthorizeUrl.Contains("?") ? "&" : "?")}{param.ToQueryString()}";
