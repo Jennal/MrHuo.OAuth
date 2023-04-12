@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace MrHuo.OAuth
 {
@@ -208,6 +209,35 @@ namespace MrHuo.OAuth
         {
             var param = BuildAuthorizeParams(state);
             param.RemoveEmptyValueItems();
+            return $"{AuthorizeUrl}{(AuthorizeUrl.Contains("?") ? "&" : "?")}{param.ToQueryString()}";
+        }
+        
+        /// <summary>
+        /// 构造一个用于跳转授权的 URL
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
+        public virtual string GetAuthorizeUrl(HttpContext httpContext, string state = "")
+        {
+            var param = BuildAuthorizeParams(state);
+            param.RemoveEmptyValueItems();
+            
+            if (param.ContainsKey("redirect_uri"))
+            {
+                var host = httpContext.Request.Host.Host;
+                var redirectUri = new Uri(param["redirect_uri"]);
+        
+                if (redirectUri.Host != host)
+                {
+                    param["redirect_uri"] = new UriBuilder(redirectUri)
+                    {
+                        Scheme = httpContext.Request.Scheme,
+                        Port = httpContext.Request.Host.Port ?? redirectUri.Port,
+                        Host = host
+                    }.Uri.ToString();
+                }
+            }
+            
             return $"{AuthorizeUrl}{(AuthorizeUrl.Contains("?") ? "&" : "?")}{param.ToQueryString()}";
         }
 
