@@ -32,7 +32,7 @@ namespace MrHuo.OAuth.NetCoreApp
 
             HttpRequestApi.EnableDebugLog = true;
 
-            //½«µÚÈý·½µÇÂ¼×é¼þ×¢Èë½øÈ¥
+            //ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½×¢ï¿½ï¿½ï¿½È¥
             services.AddSingleton(new Baidu.BaiduOAuth(OAuthConfig.LoadFrom(Configuration, "oauth:baidu")));
             services.AddSingleton(new Wechat.WechatOAuth(OAuthConfig.LoadFrom(Configuration, "oauth:wechat")));
             services.AddSingleton(new Gitlab.GitlabOAuth(OAuthConfig.LoadFrom(Configuration, "oauth:gitlab")));
@@ -57,10 +57,10 @@ namespace MrHuo.OAuth.NetCoreApp
             services.AddSingleton(new DingTalkQrcode.DingTalkQrcodeOAuth(OAuthConfig.LoadFrom(Configuration, "oauth:dingtalkqrcode")));
             services.AddSingleton(new Microsoft.MicrosoftOAuth(OAuthConfig.LoadFrom(Configuration, "oauth:microsoft")));
             services.AddSingleton(new Mi.MiOAuth(OAuthConfig.LoadFrom(Configuration, "oauth:mi")));
-            services.AddSingleton(new StackOverflow.StackOverflowOAuth(
-                OAuthConfig.LoadFrom(Configuration, "oauth:stackoverflow"),
-                Configuration["oauth:stackoverflow:api_key"])
-            );
+            // services.AddSingleton(new StackOverflow.StackOverflowOAuth(
+            //     OAuthConfig.LoadFrom(Configuration, "oauth:stackoverflow"),
+            //     Configuration["oauth:stackoverflow:api_key"])
+            // );
             services.AddSingleton(new Facebook.FacebookOAuth(OAuthConfig.LoadFrom(Configuration, "oauth:facebook")));
             services.AddSingleton(new Google.GoogleOAuth(OAuthConfig.LoadFrom(Configuration, "oauth:google")));
             services.AddSingleton(new LinkedIn.LinkedInOAuth(OAuthConfig.LoadFrom(Configuration, "oauth:linkedin")));
